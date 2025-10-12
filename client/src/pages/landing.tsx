@@ -61,8 +61,15 @@ export default function Landing() {
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <section className="relative overflow-hidden border-b">
-        {/* Gradient Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-background" />
+        {/* Animated Gradient Blur Orbs */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/30 rounded-full blur-3xl animate-float" />
+          <div className="absolute top-1/2 -left-40 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl animate-float-delayed" />
+          <div className="absolute -bottom-40 right-1/3 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-float-slow" />
+        </div>
+        
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-background/50 via-background/80 to-background" />
         
         <div className="container relative mx-auto px-4 py-20 md:py-32">
           <div className="mx-auto max-w-4xl text-center">
@@ -160,8 +167,13 @@ export default function Landing() {
       </section>
 
       {/* Screenshot Preview Section */}
-      <section className="border-t bg-muted/30 py-20" data-testid="preview-section">
-        <div className="container mx-auto px-4">
+      <section className="relative border-t bg-muted/30 py-20 overflow-hidden" data-testid="preview-section">
+        {/* Subtle Gradient Blur */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
+        </div>
+        
+        <div className="container relative mx-auto px-4">
           <div className="mx-auto max-w-2xl text-center mb-12">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4" data-testid="preview-heading">
               See It In Action
