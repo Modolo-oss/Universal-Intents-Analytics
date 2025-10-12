@@ -15,7 +15,7 @@ import { Link, useLocation } from "wouter";
 const menuItems = [
   {
     title: "Dashboard",
-    url: "/",
+    url: "/dashboard",
     icon: LayoutDashboard,
   },
   {

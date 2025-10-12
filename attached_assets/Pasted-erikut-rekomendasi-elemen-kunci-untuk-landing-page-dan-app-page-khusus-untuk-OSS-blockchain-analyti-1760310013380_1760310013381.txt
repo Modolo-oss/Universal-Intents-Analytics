@@ -1,0 +1,90 @@
+erikut rekomendasi elemen kunci untuk landing page dan app page, khusus untuk OSS blockchain analytics:
+
+Landing Page – Best Practice OSS/Web3 GG24
+1. Headline yang Jelas & Simple
+
+Jelaskan use-case dan diferensiasi (misal: “Universal Intents Analytics Platform: Indexing Real-Time ERC-7683 Intent Data Across Ethereum”).​
+
+2. Tagline/One-liner
+
+Kalimat singkat yang meng-highlight value platform, misal: “Open-source dashboard for intent tracking, protocol performance insights, and actionable analytics for the Ethereum ecosystem.”
+
+3. Demo Live & Screenshot
+
+Masukkan tombol Live Demo (tautan ke app) dan preview GIF atau screenshot utama dashboard/explorer agar reviewer langsung percaya bahwa aplikasi nyata.​
+
+4. Fitur Utama Visual
+
+List 4-6 fitur utama dengan ikon:
+
+Blockchain event indexer
+
+Interactive explorer & analytics
+
+Export data (CSV/JSON)
+
+Real-time charts & filtering
+
+Open API documentation
+
+5. Call-to-Action (CTA) Kontras
+
+Tombol “Try on Testnet Now”, “See Analytics Live”, atau “Join Community” di posisi mencolok.
+
+6. Kejelasan OSS & Funding
+
+Logo OSS/public goods, badge “Gitcoin Grants Submission”, dan link ke repo GitHub.
+
+7. Quick Intro Video (Opsional)
+
+Video pendek 30 detik bisa sangat membantu (jika punya tim/creator sempat rekam).
+
+App Page (Dashboard/Explorer)
+1. Navbar Ringkas
+
+Home | Explorer | Analytics | API Docs | Export
+
+Include switch chain/theme (dark/light), dan logo jelas.
+
+2. Dashboard Stats
+
+Card ringkas dengan: total intents, success rate, active protocol (paling atas).
+
+3. Charts & Visualisasi
+
+Line chart tren harian/bulanan
+
+Donut chart per status
+
+Bar chart protocol comparison
+
+Semua grafik dengan label dan tooltip jelas.​
+
+4. Intent Explorer Table
+
+Tabel filterable/sortable (by status, address, chain, time, protocol).
+
+5. Export Data
+
+Button download CSV/JSON, di area explorer/analytics.
+
+6. API Docs Embedded
+
+Satu page (atau modal) dengan endpoint, contoh query & response.
+
+7. Mobile Responsive
+
+Pastikan layout tetap rapi di layar tablet/mobile (pakai Tailwind CSS/component modern).​
+
+8. Trust Signal
+
+Footer sederhana: OSS license, GitHub link, contact/email untuk kolaborasi.
+
+Tips Efektif
+Pastikan semua screenshot/grafik/metric diisi data nyata meskipun masih sample, agar reviewer langsung melihat workflow berjalan.
+
+Hindari landing page terlalu panjang atau penuh teks. Utamakan visual, CTA, dan navigasi jelas.
+
+Contoh inspirasi: lihat landing page analytic tools SaaS modern seperti Databox, Dune, atau Flipside Crypto, tapi disederhanakan untuk open-source/grant.
+
+Landing page dan app page yang clean, ada demo live, dan navigasi jelas—akan membuat project MVP kamu terlihat profesional, production ready, dan “meyakinkan” untuk reviewer Gitcoin GG24 serta komunitas OSS Ethereum.
