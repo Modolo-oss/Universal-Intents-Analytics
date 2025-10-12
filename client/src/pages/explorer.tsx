@@ -4,80 +4,35 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Download, Filter } from "lucide-react";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { formatDistanceToNow } from "date-fns";
 
 export default function Explorer() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [chainFilter, setChainFilter] = useState("all");
 
-  const allIntents = [
-    {
-      id: "0x1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p",
-      type: "Cross-Chain Swap",
-      chain: "Ethereum",
-      solver: "0x9876543210fedcba9876543210fedcba",
-      status: "success" as const,
-      timestamp: "2 mins ago",
+  const { data: intentsData } = useQuery({
+    queryKey: ["/api/intents", statusFilter, chainFilter],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (statusFilter !== "all") params.append("status", statusFilter);
+      if (chainFilter !== "all") params.append("chain", chainFilter);
+      params.append("limit", "50");
+      
+      const res = await fetch(`/api/intents?${params.toString()}`);
+      return res.json();
     },
-    {
-      id: "0x2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q",
-      type: "Bridge",
-      chain: "Optimism",
-      solver: "0x8765432109edcba98765432109edcba9",
-      status: "executing" as const,
-      timestamp: "5 mins ago",
-    },
-    {
-      id: "0x3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r",
-      type: "Swap",
-      chain: "Arbitrum",
-      solver: "0x7654321098dcba987654321098dcba98",
-      status: "failed" as const,
-      timestamp: "12 mins ago",
-    },
-    {
-      id: "0x4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s",
-      type: "Cross-Chain Swap",
-      chain: "Base",
-      solver: "0x6543210987cba9876543210987cba987",
-      status: "success" as const,
-      timestamp: "18 mins ago",
-    },
-    {
-      id: "0x5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t",
-      type: "Swap",
-      chain: "Ethereum",
-      solver: "0x543210986ba98765432109876ba9876",
-      status: "pending" as const,
-      timestamp: "22 mins ago",
-    },
-    {
-      id: "0x6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u",
-      type: "Bridge",
-      chain: "Optimism",
-      solver: "0x43210985a9876543210985a98765432",
-      status: "success" as const,
-      timestamp: "28 mins ago",
-    },
-    {
-      id: "0x7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2v",
-      type: "Cross-Chain Swap",
-      chain: "Arbitrum",
-      solver: "0x321098498765432109854987654321098",
-      status: "failed" as const,
-      timestamp: "35 mins ago",
-    },
-    {
-      id: "0x8h9i0j1k2l3m4n5o6p7q8r9s0t1u2v3w",
-      type: "Swap",
-      chain: "Base",
-      solver: "0x2109837876543210983787654321098",
-      status: "success" as const,
-      timestamp: "42 mins ago",
-    },
-  ];
+  });
 
-  const handleExport = () => {
-    console.log("Exporting data...");
+  const allIntents = intentsData?.intents?.map((intent: any) => ({
+    ...intent,
+    timestamp: formatDistanceToNow(new Date(intent.timestamp), { addSuffix: true }),
+  })) || [];
+
+  const handleExport = async () => {
+    const format = "json";
+    const url = `/api/export?format=${format}`;
+    window.open(url, '_blank');
   };
 
   return (
@@ -132,7 +87,7 @@ export default function Explorer() {
 
       <div className="bg-muted/30 rounded-lg p-4 flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          Showing <span className="font-medium text-foreground">{allIntents.length}</span> intents
+          Showing <span className="font-medium text-foreground">{allIntents.length}</span> of <span className="font-medium text-foreground">{intentsData?.total || 0}</span> intents
         </p>
         <p className="text-sm text-muted-foreground">
           Filters: <span className="font-medium text-foreground">{statusFilter === "all" ? "All Status" : statusFilter}</span>, <span className="font-medium text-foreground">{chainFilter === "all" ? "All Chains" : chainFilter}</span>

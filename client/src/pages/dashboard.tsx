@@ -5,8 +5,57 @@ import { ProtocolRankings } from "@/components/protocol-rankings";
 import { IntentTable } from "@/components/intent-table";
 import { TimeRangeSelector } from "@/components/time-range-selector";
 import { Activity, CheckCircle2, Layers, TrendingUp } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { formatDistanceToNow } from "date-fns";
+
+interface Intent {
+  id: string;
+  type: string;
+  chain: string;
+  status: "success" | "failed" | "pending" | "executing";
+  solver: string;
+  timestamp: string;
+}
+
+interface Summary {
+  totalIntents: number;
+  successRate: number;
+  activeChains: number;
+  topProtocol: string;
+}
+
+interface ChainData {
+  name: string;
+  value: number;
+}
+
+interface ProtocolData {
+  name: string;
+  intents: number;
+  percentage: number;
+}
 
 export default function Dashboard() {
+  const { data: summary } = useQuery<Summary>({
+    queryKey: ["/api/analytics/summary"],
+  });
+
+  const { data: chainData } = useQuery<ChainData[]>({
+    queryKey: ["/api/analytics/chain-distribution"],
+  });
+
+  const { data: protocolsData } = useQuery<ProtocolData[]>({
+    queryKey: ["/api/analytics/protocol-rankings"],
+  });
+
+  const { data: intentsData } = useQuery({
+    queryKey: ["/api/intents"],
+    queryFn: async () => {
+      const res = await fetch("/api/intents?limit=10");
+      return res.json();
+    },
+  });
+
   const volumeData = [
     { date: "Jan 1", ethereum: 4000, optimism: 2400, arbitrum: 1800, base: 1200 },
     { date: "Jan 5", ethereum: 3000, optimism: 1398, arbitrum: 2100, base: 980 },
@@ -17,62 +66,10 @@ export default function Dashboard() {
     { date: "Jan 30", ethereum: 7490, optimism: 4300, arbitrum: 3500, base: 2300 },
   ];
 
-  const chainData = [
-    { name: "Ethereum", value: 45 },
-    { name: "Optimism", value: 25 },
-    { name: "Arbitrum", value: 18 },
-    { name: "Base", value: 12 },
-  ];
-
-  const protocols = [
-    { name: "UniswapX", intents: 458230, percentage: 42 },
-    { name: "1inch Fusion", intents: 324156, percentage: 30 },
-    { name: "CowSwap", intents: 216104, percentage: 20 },
-    { name: "0x Protocol", intents: 86442, percentage: 8 },
-  ];
-
-  const recentIntents = [
-    {
-      id: "0x1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p",
-      type: "Cross-Chain Swap",
-      chain: "Ethereum",
-      solver: "0x9876543210fedcba9876543210fedcba",
-      status: "success" as const,
-      timestamp: "2 mins ago",
-    },
-    {
-      id: "0x2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q",
-      type: "Bridge",
-      chain: "Optimism",
-      solver: "0x8765432109edcba98765432109edcba9",
-      status: "executing" as const,
-      timestamp: "5 mins ago",
-    },
-    {
-      id: "0x3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r",
-      type: "Swap",
-      chain: "Arbitrum",
-      solver: "0x7654321098dcba987654321098dcba98",
-      status: "failed" as const,
-      timestamp: "12 mins ago",
-    },
-    {
-      id: "0x4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s",
-      type: "Cross-Chain Swap",
-      chain: "Base",
-      solver: "0x6543210987cba9876543210987cba987",
-      status: "success" as const,
-      timestamp: "18 mins ago",
-    },
-    {
-      id: "0x5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t",
-      type: "Swap",
-      chain: "Ethereum",
-      solver: "0x543210986ba98765432109876ba9876",
-      status: "pending" as const,
-      timestamp: "22 mins ago",
-    },
-  ];
+  const recentIntents = intentsData?.intents?.map((intent: Intent) => ({
+    ...intent,
+    timestamp: formatDistanceToNow(new Date(intent.timestamp), { addSuffix: true }),
+  })) || [];
 
   return (
     <div className="space-y-6">
@@ -89,30 +86,22 @@ export default function Dashboard() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           title="Total Intents"
-          value="1,245,890"
-          change={12.5}
-          changeLabel="vs last month"
+          value={summary?.totalIntents?.toLocaleString() || "0"}
           icon={<Activity className="h-5 w-5" />}
         />
         <MetricCard
           title="Success Rate"
-          value="94.2%"
-          change={2.1}
-          changeLabel="vs last month"
+          value={summary?.successRate ? `${summary.successRate.toFixed(1)}%` : "0%"}
           icon={<CheckCircle2 className="h-5 w-5" />}
         />
         <MetricCard
           title="Active Chains"
-          value="8"
-          change={0}
-          changeLabel="stable"
+          value={summary?.activeChains?.toString() || "0"}
           icon={<Layers className="h-5 w-5" />}
         />
         <MetricCard
           title="Top Protocol"
-          value="UniswapX"
-          change={5.3}
-          changeLabel="market share"
+          value={summary?.topProtocol || "N/A"}
           icon={<TrendingUp className="h-5 w-5" />}
         />
       </div>
@@ -120,8 +109,8 @@ export default function Dashboard() {
       <VolumeChart data={volumeData} />
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <ChainDistribution data={chainData} />
-        <ProtocolRankings protocols={protocols} />
+        <ChainDistribution data={chainData || []} />
+        <ProtocolRankings protocols={protocolsData || []} />
       </div>
 
       <div>
