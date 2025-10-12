@@ -1,0 +1,182 @@
+Universal Intents Analytics Platform — Project Brief
+1. Latar Belakang & Tujuan
+Salah satu tantangan utama ekosistem Ethereum (khususnya pasca adopsi OIF/ERC-7683) adalah kurangnya visibilitas, monitoring, dan transparansi atas aktivitas intents lintas chain dan aplikasi.
+Sebagai solusi, dibutuhkan platform analytics open-source berbasis web yang mampu:
+
+Mengindeks, menganalisa, dan memvisualisasikan interaksi intents (permintaan, eksekusi, hasil, error, dsb) pada OIF lintas protokol dan chain.
+
+Menjadi “single pane of glass” (satu pintu data) bagi dev, auditor, builder, dan ecosystem watcher untuk menganalisa tren, kegagalan, pola, serta volume intents—secara real-time maupun historical.
+
+2. Manfaat & Problem Solved
+Developer: Mempercepat debugging, mengukur adopsi, dan meningkatkan reliability aplikasi OIF.
+
+Ecosystem builder/Researcher: Mendukung riset, prediksi tren, audit interoperabilitas serta transparansi data publik.
+
+Komunitas: Memantau real impact solusi interoperability—tidak sekadar klaim.
+
+3. Fitur Utama
+A. Indexing & Data Aggregation
+Indexer backend crawling/subscribe ke event intent ERC-7683 (OIF-related) dari beberapa chain (Ethereum mainnet, testnet, dan chain EVM lain).
+
+Pengambilan dan parsing data: intent ID, jenis intent, parameter, status eksekusi, result, involved addresses, timestamps, signature, dsb.
+
+B. Analytics & Metrics
+Statistik penggunaan intents: Total intent, sent, relayed, executed, failed, serta grafik volume harian/bulanan.
+
+Visualisasi tren adopsi, protokol terbanyak digunakan, top solver/relayer, breakdown berdasarkan chain/protocol, ratio keberhasilan/gagal.
+
+Query/filter: by contract address, user, solver, waktu, status, chain.
+
+C. Dashboard & Visualization
+Frontend modern (React/Next.js) dengan dashboard interaktif: charts metrics utama, donut/bar/line chart, realtime feed.
+
+Data table intents (filter, sort, search), intent explorer (lihat detail satu intent).
+
+Export data (CSV/JSON) dan REST API publik untuk di-query oleh researcher/tools lain.
+
+D. Open API Layer
+Endpoint publik (REST/GraphQL, tergantung stack) untuk retrieve summary, intent event, histori, dsb.
+
+E. Optional (bila scope memungkinkan)
+User feedback dan basic social insight (upvote intent berbagai aplikasi, submit feedback).
+
+Integrasi notifikasi untuk intent tertentu (webhook/Discord/Telegram, jika ada issue/error spike).
+
+4. Arsitektur Teknis
+Backend Indexer: Node.js/TypeScript/Go + library ethers.js/web3.py untuk crawl/subscription event intent pada chain OIF support.
+
+Database: PostgreSQL/MongoDB untuk store event intents dan result.
+
+API Server: Express/Fastify/NestJS untuk serve data ke frontend/API publik.
+
+Frontend: React/Next.js/Vite, dengan design dashboard clean, mobile-friendly.
+
+Deployment: VPS atau cloud (Vercel, Railway, Heroku, dsb).
+
+Open Source (MIT/Apache 2.0) dan bisa self-host.
+
+5. Alur Kerja
+Indexer subscribe ke smart contract OIF/ERC-7683 event pada node RPC publik beberapa EVM chain.
+
+Semua event intent ditarik dan disimpan ke database (beserta metadata: waktu, chain, sender, status, payload, dsb).
+
+Backend API menyediakan endpoint summary analytics dan fetch intents.
+
+Frontend dashboard menampilkan analytics utama, list intent, trend, breakdown—realtime dan historical.
+
+Dev/researcher bisa download data atau hit API untuk kebutuhan analisis external.
+
+6. Output & Deliverable
+Dashboard Webapp public (siap dipakai siapa saja) dengan fitur analytics di atas.
+
+Dokumentasi API untuk semua endpoint public (Swagger/OpenAPI atau markdown).
+
+Source code open-source (GitHub/GitLab).
+
+Deployment instructions (README lengkap, siap fork/cloning/deploy sendiri).
+
+(Optional) Dataset sample atau export hasil indexing untuk testing researcher.
+
+7. Target Sukses & Nilai Jual
+Minimal viable product (MVP) dapat live dalam 2–3 minggu development tim kecil (1–3 dev).
+
+Skalabel: bisa diperluas ke chain/protokol baru dengan sedikit modifikasi.
+
+Tinggi impact (alat utama bagi dev dan watcher OIF di masa awal adopsi), murah biaya cloud/infra.
+
+Sepenuhnya open source, sangat sesuai etos funding Gitcoin.
+
+Catatan: Bila ingin instruksi dipertajam untuk spesifikasi tools/framework/stack/UX lebih detail, atau ingin ada demo dataset/fake contract address, dapat disesuaikan!Berikut adalah brief lengkap Universal Intents Analytics Platform, cocok diberikan ke tim developer (misal, Replit, Cursor AI):
+
+Judul Proyek
+Universal Intents Analytics Platform
+
+Deskripsi Singkat
+Platform fullstack yang secara otomatis mengindeks, menganalisis, dan menampilkan data aktivitas intent (Open Intents Framework/ERC-7683) lintas chain di ekosistem Ethereum. Ditujukan untuk developer, researcher, ecosystem builder, dan komunitas.
+
+Tujuan & Nilai
+Memberikan transparansi penuh dan insight mengenai interaksi intents (misal: swap, bridge, cross-chain actions) secara real-time serta historical.
+
+Mengakselerasi debugging, mengukur adopsi, dan peningkatan interoperabilitas antar aplikasi/protokol OIF.
+
+Menyediakan REST API & export data agar komunitas bisa melakukan analisis mandiri.
+
+Fitur Utama
+Blockchain Indexer
+
+Crawling/subscription ke smart contract intents/ERC-7683 di chain Ethereum dan kompatibel.
+
+Menyimpan event intents (ID, param, status, result, addresses, timestamps, dsb) dalam database.
+
+Analytics Engine
+
+Analisa metrik: volume intents, sukses/gagal, ranking protokol/solver, tren adopsi, statistik bulanan/harian.
+
+Agregasi data berdasarkan chain/protokol/pengguna/solver & visualisasi performa.
+
+Interactive Dashboard (Frontend)
+
+Dashboard responsif (React/Next) untuk grafik tren, table data, explorer detail satu intent, filter user/chain/time.
+
+Download/export .CSV/.JSON dan public API documentation (OpenAPI/Swagger, dsb).
+
+(Opsi) Notifikasi & Feedback
+
+Opsi notifikasi (webhook/email/Telegram) jika intent gagal atau status spesifik,
+
+Fitur feedback basic per intent/project.
+
+Stack yang Diusulkan
+Backend Indexer:
+
+NodeJS + TypeScript (atau Go/Python), library ethers.js/web3.py untuk event crawl.
+
+Database:
+
+PostgreSQL atau MongoDB.
+
+API:
+
+Express/NestJS/Fastify, REST (bisa opsional GraphQL).
+
+Frontend:
+
+ReactJS/NextJS/Vite, Tailwind/Chakra UI.
+
+Deployment:
+
+Cloud (dapat Vercel, Railway, digitalocean), siap dockerized.
+
+OSS Licence:
+
+MIT atau Apache 2.0.
+
+Alur Kerja
+Indexer subscribe ke RPC EVM chain → ambil semua event intents.
+
+Data disimpan di DB, diproses oleh analytics engine.
+
+REST API expose endpoint summary (top intents, statistik, failure log, dsb).
+
+Frontend tampilkan analitik dan table data, user bisa filter/search/download hasil.
+
+(Opsional) Notifikasi ke Discord/Telegram/email untuk alert atau milestone tertentu.
+
+Output yang Diharapkan
+Dashboard webapp siap pakai.
+
+Kode sumber open-source di Github.
+
+Dokumentasi API dan instruksi instalasi.
+
+(Opsional) Dataset crawler untuk external data analysis.
+
+Nilai Jual
+Proyek dapat dikembangkan mulai satu engineer, cost infra minimal, deployment mudah.
+
+Tingkat manfaat tinggi: jadi rujukan developer & researcher dalam ekosistem OIF baru.
+
+Sangat relevan dengan nilai QF Gitcoin: open data, standardisasi, interop, analytics, dan penguatan adopsi aplikasi intents.
+
+Jika ingin modifikasi spesifik (misal: chain mana saja, fitur analytics tambahan, style UI/UX), bisa didetailkan sesuai kebutuhan calon pembuatnya.
+
