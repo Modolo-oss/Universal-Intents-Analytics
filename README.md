@@ -197,49 +197,89 @@ npm run dev
 
 ## 📊 Current Data Source
 
-**Important**: The MVP currently uses **sample/testing data** for demonstration purposes.
+**✅ LIVE BLOCKCHAIN DATA**: The platform is now indexing **real ERC-7683 events** from production contracts!
 
-- ✅ Sample data generator creates 50 random intents on server startup
-- ✅ Simulates realistic intent transactions across multiple chains
-- ✅ All infrastructure is production-ready and fully functional
+- ✅ **Live Across Protocol contracts** on Arbitrum and Base mainnet
+- ✅ **Real-time event listening** via WebSocket connections
+- ✅ **Production-ready infrastructure** with proper error handling
+- ✅ **CrossChainOrderOpened, CrossChainOrderFilled, CrossChainOrderCancelled** events indexed
 
-### Why Sample Data?
+### Current Live Contracts
 
-This approach allows us to:
-- Thoroughly test and demonstrate all platform features
-- Prove technical capability without dependency on specific contracts
-- Show complete understanding of ERC-7683 event structure
-- Provide instant value while preparing for production deployment
+The platform is actively monitoring these **AcrossOriginSettler** contracts:
 
-## 🔄 Production Migration
+| Chain | Contract Address | Status |
+|-------|------------------|--------|
+| **Arbitrum** | `0xB0B07055F214Ce59ccB968663d3435B9f3294998` | ✅ Live |
+| **Base** | `0x4afb570AC68BfFc26Bb02FdA3D801728B0f93C9E` | ✅ Live |
+| **Sepolia** | `0x43f133FE6fDFA17c417695c476447dc2a449Ba5B` | ✅ Testnet |
+| **Sepolia** | `0x5b3acAADE6c53eFCD113dCa116F71312f2df666d` | ✅ Testnet |
 
-The platform is **100% ready** for live blockchain data. Migration takes ~5 minutes:
+### ERC-7683 Deployment Status
 
-### Steps to Enable Live Data:
+**Live Contracts (Currently Monitored):**
+- ✅ **Arbitrum Mainnet** - `0xB0B07055F214Ce59ccB968663d3435B9f3294998` (AcrossOriginSettler)
+- ✅ **Base Mainnet** - `0x4afb570AC68BfFc26Bb02FdA3D801728B0f93C9E` (AcrossOriginSettler)
+- ✅ **Sepolia Testnet** - `0x43f133FE6fDFA17c417695c476447dc2a449Ba5B` (Across Testnet Spoke1)
+- ✅ **Sepolia Testnet** - `0x5b3acAADE6c53eFCD113dCa116F71312f2df666d` (Across Testnet Spoke2)
 
-1. Update contract addresses in `server/indexer.ts`:
+**Not Yet Publicly Available:**
+- ⏳ **Optimism Mainnet** - Superchain integration in progress
+- ⏳ **Ethereum Mainnet** - Still L2-focused deployment
+- ⏳ **Other Chains** (Polygon, Avalanche, etc.) - No public ERC-7683 deployments found
+
+**Implementation Notes:**
+- **Across Protocol** is the primary ERC-7683 implementer with live contracts
+- **UniswapX** uses ERC-7683 backend but hasn't published specific contract addresses
+- Platform is ready to add new contracts as they become available
+
+### What This Means
+
+- **Real intent transactions** are being indexed as they happen
+- **Live success/failure rates** reflect actual Across Protocol performance
+- **Production data** powers all analytics and dashboards
+- **No more sample data** - everything is authentic blockchain activity
+
+## 🎉 Production Status: LIVE & OPERATIONAL
+
+The platform is **already running on live blockchain data**! No migration needed.
+
+### Current Live Infrastructure
+
+✅ **WebSocket RPC Connections** - Reliable real-time event listening
+✅ **Across Protocol Integration** - Monitoring live AcrossOriginSettler contracts  
+✅ **Multi-chain Support** - Arbitrum and Base mainnet + Sepolia testnet
+✅ **Event Processing** - CrossChainOrderOpened, CrossChainOrderFilled, CrossChainOrderCancelled
+✅ **Error Handling** - Robust connection management and failure recovery
+✅ **Database Storage** - PostgreSQL with optimized indexes for performance
+
+### What's Happening Right Now
+
+- **Live event monitoring** across multiple chains
+- **Real-time intent indexing** as transactions occur
+- **Automatic status updates** when intents are filled or cancelled
+- **Production analytics** based on actual Across Protocol activity
+- **WebSocket reliability** with automatic reconnection handling
+
+### Technical Architecture
+
 ```typescript
-// Replace placeholder addresses
-contractAddress: "0x0000000000000000000000000000000000000001" // Current
-
-// With real ERC-7683 contract addresses
-contractAddress: "0xYourRealContractAddress" // Production
+// Live contract configurations (server/indexer.ts)
+const CHAIN_CONFIGS = [
+  {
+    name: "Arbitrum",
+    chainId: 42161,
+    rpcUrl: "wss://arbitrum-one-rpc.publicnode.com",
+    contractAddress: "0xB0B07055F214Ce59ccB968663d3435B9f3294998", // Across AcrossOriginSettler
+  },
+  {
+    name: "Base", 
+    chainId: 8453,
+    rpcUrl: "wss://base.publicnode.com",
+    contractAddress: "0x4afb570AC68BfFc26Bb02FdA3D801728B0f93C9E", // Across AcrossOriginSettler
+  }
+];
 ```
-
-2. Restart the server - that's it!
-
-The indexer will automatically:
-- ✅ Listen to `CrossChainOrderOpened`, `CrossChainOrderFilled`, `CrossChainOrderCancelled` events
-- ✅ Parse real blockchain data
-- ✅ Store in database
-- ✅ Display in dashboard/explorer in real-time
-
-### Technical Readiness
-
-- ✅ RPC connections established (Ethereum, Optimism)
-- ✅ Event listener infrastructure implemented
-- ✅ Data parsing and storage pipeline ready
-- ✅ All analytics calculations work with real data structure
 
 ## 🏗️ Tech Stack
 
@@ -416,24 +456,48 @@ npm test
 
 This platform was built for the Gitcoin Grants Round 24 (GG24).
 
-**Current Status**: MVP v1.0 - Production Ready Infrastructure
+**Current Status**: ✅ **PRODUCTION LIVE** - Fully Operational Platform
 
-- All core features are implemented and tested
-- Database, API, and frontend are production-ready
-- Blockchain indexer infrastructure is ready for live deployment
-- Sample data demonstrates full platform capabilities
+- ✅ **Live blockchain indexing** - Real ERC-7683 events from Across Protocol
+- ✅ **Production-ready infrastructure** - WebSocket connections, error handling, database optimization
+- ✅ **Complete feature set** - Dashboard, explorer, analytics, API endpoints, data export
+- ✅ **Multi-chain support** - Arbitrum, Base mainnet + Sepolia testnet
+- ✅ **Real-time monitoring** - Intent transactions indexed as they happen
 
-The platform can switch to mainnet/testnet data immediately when production resources (real ERC-7683 contract addresses) are available.
+### Key Achievements
+
+🎉 **SUCCESSFULLY MIGRATED TO LIVE DATA** - No more sample data, everything is real!
+🔧 **ALL CRITICAL ISSUES RESOLVED** - Proper error handling, connection management, status updates
+📊 **PRODUCTION ANALYTICS** - Live success rates, protocol rankings, chain distribution
+⚡ **REAL-TIME PERFORMANCE** - WebSocket connections for efficient event listening
+
+### Critical Issues Resolved
+
+During development, several critical issues were identified and resolved:
+
+1. **✅ Intent Status Updates** - Added `updateIntentStatus()` method for tracking intent lifecycle
+2. **✅ Error Handling** - Fixed `initialize()` to properly throw errors when connections fail
+3. **✅ Production Readiness** - Removed sample data generation, enabled live blockchain indexing
+4. **✅ Connection Management** - Implemented robust WebSocket connection handling with proper cleanup
+
+These fixes ensure the platform operates reliably in production with real blockchain data.
 
 ## 🛣️ Roadmap
 
-- [ ] Connect to live ERC-7683 contracts on mainnet
-- [ ] Add WebSocket support for real-time dashboard updates
-- [ ] Implement user authentication and saved filters
-- [ ] Add historical data backfilling
-- [ ] Support for additional chains (Polygon, Avalanche, etc.)
-- [ ] Advanced analytics (MEV detection, solver performance)
-- [ ] Notification system for intent monitoring
+### ✅ Completed (Production Ready)
+- [x] **Connect to live ERC-7683 contracts on mainnet** - Arbitrum & Base live
+- [x] **WebSocket support for real-time updates** - Implemented and operational
+- [x] **Production error handling** - Robust connection management
+- [x] **Live intent status tracking** - Real-time updates for fills/cancels
+
+### 🚀 Future Enhancements
+- [ ] **Additional chain support** - Polygon, Avalanche, Optimism mainnet
+- [ ] **User authentication** - Saved filters and personalized dashboards
+- [ ] **Historical data backfilling** - Complete intent history from contract deployment
+- [ ] **Advanced analytics** - MEV detection, solver performance analysis
+- [ ] **Notification system** - Real-time alerts for intent monitoring
+- [ ] **API rate limiting** - Production-grade API protection
+- [ ] **Data retention policies** - Automated cleanup and archiving
 
 ## 📝 License
 
