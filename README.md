@@ -305,7 +305,7 @@ const CHAIN_CONFIGS = [
 ## 📁 Project Structure
 
 ```
-universal-intents-analytics/
+IntentInsights/
 ├── client/                      # Frontend React application
 │   ├── src/
 │   │   ├── pages/              # Page components
@@ -313,16 +313,32 @@ universal-intents-analytics/
 │   │   │   ├── explorer.tsx    # Intent explorer with filtering
 │   │   │   ├── analytics.tsx   # Advanced analytics charts
 │   │   │   ├── api-docs.tsx    # API documentation
-│   │   │   └── settings.tsx    # User settings
+│   │   │   ├── settings.tsx    # User settings
+│   │   │   ├── landing.tsx     # Landing page
+│   │   │   └── not-found.tsx   # 404 error page
 │   │   ├── components/         # Reusable UI components
 │   │   │   ├── ui/             # Shadcn components (button, card, etc.)
+│   │   │   ├── examples/       # Example components
 │   │   │   ├── metric-card.tsx # Dashboard metric cards
-│   │   │   └── app-sidebar.tsx # Navigation sidebar
+│   │   │   ├── app-sidebar.tsx # Navigation sidebar
+│   │   │   ├── chain-distribution.tsx # Chain distribution chart
+│   │   │   ├── intent-table.tsx # Intent data table
+│   │   │   ├── protocol-rankings.tsx # Protocol rankings
+│   │   │   ├── search-bar.tsx  # Search functionality
+│   │   │   ├── status-badge.tsx # Status indicators
+│   │   │   ├── time-range-selector.tsx # Time filtering
+│   │   │   ├── theme-provider.tsx # Theme management
+│   │   │   ├── theme-toggle.tsx # Dark/light mode toggle
+│   │   │   └── volume-chart.tsx # Volume visualization
 │   │   ├── lib/                # Utilities and configurations
 │   │   │   ├── queryClient.ts  # TanStack Query setup
 │   │   │   └── utils.ts        # Helper functions
 │   │   ├── hooks/              # Custom React hooks
-│   │   └── App.tsx             # Root component with routing
+│   │   │   ├── use-mobile.tsx  # Mobile detection hook
+│   │   │   └── use-toast.ts    # Toast notifications
+│   │   ├── App.tsx             # Root component with routing
+│   │   ├── main.tsx            # Application entry point
+│   │   └── index.css           # Global styles
 │   └── index.html              # Entry HTML
 │
 ├── server/                     # Backend Express server
@@ -336,10 +352,18 @@ universal-intents-analytics/
 ├── shared/                     # Shared TypeScript types
 │   └── schema.ts              # Database schema & Zod validation
 │
-├── design_guidelines.md        # UI/UX design system
-├── replit.md                  # Project documentation
+├── attached_assets/           # Project assets
+│   └── Logo.png               # Project logo
+│
+├── components.json            # Shadcn/ui configuration
+├── design_guidelines.md       # UI/UX design system
 ├── drizzle.config.ts          # Drizzle ORM configuration
-└── package.json               # Dependencies & scripts
+├── package.json               # Dependencies & scripts
+├── package-lock.json          # Locked dependency versions
+├── postcss.config.js          # PostCSS configuration
+├── tailwind.config.ts         # Tailwind CSS configuration
+├── tsconfig.json              # TypeScript configuration
+└── vite.config.ts             # Vite build configuration
 ```
 
 ### Key Files Explained
@@ -347,12 +371,22 @@ universal-intents-analytics/
 #### Frontend
 - **`client/src/pages/dashboard.tsx`** - Main dashboard displaying metrics, charts, and protocol rankings
 - **`client/src/pages/explorer.tsx`** - Searchable table with advanced filtering (chain, status, pagination)
+- **`client/src/pages/analytics.tsx`** - Advanced analytics with detailed charts and visualizations
+- **`client/src/pages/landing.tsx`** - Landing page with project overview
 - **`client/src/lib/queryClient.ts`** - Configured TanStack Query client with default fetcher
+- **`client/src/components/intent-table.tsx`** - Reusable intent data table component
+- **`client/src/components/metric-card.tsx`** - Dashboard metric display cards
 
 #### Backend
-- **`server/indexer.ts`** - Core blockchain indexer that listens to ERC-7683 events
-- **`server/storage.ts`** - Database abstraction layer with all CRUD operations
+- **`server/indexer.ts`** - Core blockchain indexer that listens to ERC-7683 events from Across Protocol
+- **`server/storage.ts`** - Database abstraction layer with all CRUD operations and analytics queries
 - **`server/routes.ts`** - Express routes for intents, analytics, and export endpoints
+- **`server/db.ts`** - Database connection setup with Drizzle ORM
+
+#### Configuration
+- **`components.json`** - Shadcn/ui component configuration
+- **`drizzle.config.ts`** - Database schema and migration configuration
+- **`vite.config.ts`** - Build tool configuration for development and production
 
 #### Shared
 - **`shared/schema.ts`** - Single source of truth for data types, used by both frontend and backend
