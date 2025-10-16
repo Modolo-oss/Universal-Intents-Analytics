@@ -17,30 +17,31 @@ interface ChainConfig {
 }
 
 // Production chain configurations with real Across Protocol (AcrossOriginSettler) contracts
+// Using WebSocket providers for efficient real-time event listening
 const CHAIN_CONFIGS: ChainConfig[] = [
   {
     name: "Arbitrum",
     chainId: 42161,
-    rpcUrl: "https://arb1.arbitrum.io/rpc",
+    rpcUrl: "wss://arbitrum-one-rpc.publicnode.com", // WebSocket for reliable event listening
     contractAddress: "0xB0B07055F214Ce59ccb968663d3435B9f3294998", // Across AcrossOriginSettler
   },
   {
     name: "Base",
     chainId: 8453,
-    rpcUrl: "https://mainnet.base.org",
+    rpcUrl: "wss://base.publicnode.com", // WebSocket for reliable event listening
     contractAddress: "0x4afb570AC68BfFc26Bb02FdA3D801728B0f93C9E", // Across AcrossOriginSettler
   },
   // Testnet configuration (uncomment for testing)
   // {
   //   name: "Sepolia",
   //   chainId: 11155111,
-  //   rpcUrl: "https://ethereum-sepolia.publicnode.com",
+  //   rpcUrl: "wss://ethereum-sepolia-rpc.publicnode.com",
   //   contractAddress: "0x43f133FE6fDFA17c417695c476447dc2a449Ba5B", // Across Testnet Spoke1
   // },
 ];
 
 class IntentIndexer {
-  private providers: Map<string, ethers.JsonRpcProvider> = new Map();
+  private providers: Map<string, ethers.WebSocketProvider | ethers.JsonRpcProvider> = new Map();
   private contracts: Map<string, ethers.Contract> = new Map();
   private isRunning = false;
 
@@ -49,7 +50,11 @@ class IntentIndexer {
     
     for (const config of CHAIN_CONFIGS) {
       try {
-        const provider = new ethers.JsonRpcProvider(config.rpcUrl);
+        // Use WebSocketProvider for wss:// URLs, JsonRpcProvider for https://
+        const provider = config.rpcUrl.startsWith('wss://')
+          ? new ethers.WebSocketProvider(config.rpcUrl)
+          : new ethers.JsonRpcProvider(config.rpcUrl);
+        
         this.providers.set(config.name, provider);
 
         const contract = new ethers.Contract(
@@ -59,7 +64,7 @@ class IntentIndexer {
         );
         this.contracts.set(config.name, contract);
 
-        console.log(`✓ Connected to ${config.name}`);
+        console.log(`✓ Connected to ${config.name} (${config.rpcUrl.startsWith('wss://') ? 'WebSocket' : 'HTTP'})`);
       } catch (error) {
         console.error(`✗ Failed to connect to ${config.name}:`, error);
       }
@@ -153,6 +158,13 @@ class IntentIndexer {
     
     for (const contract of Array.from(this.contracts.values())) {
       contract.removeAllListeners();
+    }
+    
+    // Close WebSocket connections
+    for (const provider of Array.from(this.providers.values())) {
+      if (provider instanceof ethers.WebSocketProvider) {
+        await provider.destroy();
+      }
     }
     
     console.log("Indexer stopped");
