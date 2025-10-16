@@ -5,6 +5,7 @@ import { eq, desc, and, sql, count } from "drizzle-orm";
 export interface IStorage {
   createIntent(intent: InsertIntent): Promise<Intent>;
   getIntent(id: string): Promise<Intent | undefined>;
+  updateIntentStatus(id: string, status: string, event?: any): Promise<Intent | undefined>;
   getIntents(filters?: {
     status?: string;
     chain?: string;
@@ -34,6 +35,37 @@ export class DatabaseStorage implements IStorage {
   async getIntent(id: string): Promise<Intent | undefined> {
     const [intent] = await db.select().from(intents).where(eq(intents.id, id));
     return intent || undefined;
+  }
+
+  async updateIntentStatus(id: string, status: string, event?: any): Promise<Intent | undefined> {
+    const existingIntent = await this.getIntent(id);
+    if (!existingIntent) {
+      return undefined;
+    }
+
+    // Append new event to existing events array
+    const existingEvents = Array.isArray(existingIntent.events) ? existingIntent.events : [];
+    const updatedEvents = [...existingEvents];
+    
+    if (event) {
+      updatedEvents.push({
+        type: event.type,
+        timestamp: new Date().toISOString(),
+        blockNumber: event.blockNumber,
+        transactionHash: event.transactionHash,
+      });
+    }
+
+    const [updatedIntent] = await db
+      .update(intents)
+      .set({ 
+        status,
+        events: updatedEvents,
+      })
+      .where(eq(intents.id, id))
+      .returning();
+
+    return updatedIntent || undefined;
   }
 
   async getIntents(filters?: {

@@ -125,11 +125,14 @@ class IntentIndexer {
       // Listen for CrossChainOrderFilled events
       contract.on("CrossChainOrderFilled", async (orderId: string, solver: string, fillAmount: bigint, event: any) => {
         try {
-          const existingIntent = await storage.getIntent(orderId);
-          if (existingIntent) {
-            // Update intent status to success
-            // Note: In production, you'd want an update method in storage
-            console.log(`✓ Intent ${orderId.slice(0, 10)}... filled on ${chainName}`);
+          const updatedIntent = await storage.updateIntentStatus(orderId, "success", {
+            type: "OrderFilled",
+            blockNumber: event.log.blockNumber,
+            transactionHash: event.log.transactionHash,
+          });
+          
+          if (updatedIntent) {
+            console.log(`✓ Intent ${orderId.slice(0, 10)}... filled on ${chainName} (status: success)`);
           }
         } catch (error) {
           console.error("Error updating intent:", error);
@@ -139,10 +142,14 @@ class IntentIndexer {
       // Listen for CrossChainOrderCancelled events
       contract.on("CrossChainOrderCancelled", async (orderId: string, user: string, event: any) => {
         try {
-          const existingIntent = await storage.getIntent(orderId);
-          if (existingIntent) {
-            // Update intent status to failed
-            console.log(`✓ Intent ${orderId.slice(0, 10)}... cancelled on ${chainName}`);
+          const updatedIntent = await storage.updateIntentStatus(orderId, "failed", {
+            type: "OrderCancelled",
+            blockNumber: event.log.blockNumber,
+            transactionHash: event.log.transactionHash,
+          });
+          
+          if (updatedIntent) {
+            console.log(`✓ Intent ${orderId.slice(0, 10)}... cancelled on ${chainName} (status: failed)`);
           }
         } catch (error) {
           console.error("Error updating cancelled intent:", error);
