@@ -170,8 +170,8 @@ React application:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/universal-intents-analytics.git
-cd universal-intents-analytics
+git clone https://github.com/Modolo-oss/Universal-Intents-Analytics.git
+cd Universal-Intents-Analytics
 ```
 
 2. Install dependencies:
@@ -299,7 +299,7 @@ const CHAIN_CONFIGS = [
 
 ### Blockchain Indexing
 - **ERC-7683 (OIF)** event monitoring
-- **Multi-chain support** - Ethereum, Optimism, Arbitrum, Base
+- **Multi-chain support** - Arbitrum, Base mainnet + Sepolia testnet
 - **WebSocket RPC** connections for real-time events
 
 ## 📁 Project Structure
@@ -468,22 +468,23 @@ CREATE INDEX idx_intents_timestamp ON intents(timestamp);
 - `GET /api/analytics/protocol-rankings` - Intent count per protocol
 
 ### Export
-- `GET /api/export/csv` - Export intents as CSV
-- `GET /api/export/json` - Export intents as JSON
+- `GET /api/export?format=csv` - Export intents as CSV
+- `GET /api/export?format=json` - Export intents as JSON
 
 ## 🧪 Testing
 
-The platform includes comprehensive end-to-end testing:
+The platform is production-ready and can be tested by running the development server:
 
 ```bash
-# Run all tests
-npm test
+# Start the development server
+npm run dev
 
-# The test suite covers:
-# - Dashboard metrics and visualizations
-# - Intent explorer filtering
-# - Analytics page functionality
-# - API endpoint responses
+# The platform includes:
+# - Live blockchain event monitoring
+# - Real-time dashboard updates
+# - Intent explorer with filtering
+# - Analytics and data visualization
+# - REST API endpoints for data access
 ```
 
 ## 🎯 Gitcoin GG24 Submission
@@ -535,7 +536,7 @@ These fixes ensure the platform operates reliably in production with real blockc
 
 ## 📝 License
 
-MIT License - see [LICENSE](LICENSE) file for details
+MIT License - This project is open source and available under the MIT License.
 
 ## 🤝 Contributing
 
