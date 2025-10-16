@@ -6,13 +6,20 @@ import { indexer } from "./indexer";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize indexer and start listening for live blockchain events
-  indexer.initialize().then(async () => {
+  try {
+    await indexer.initialize();
+    console.log("✓ Indexer initialized successfully");
+    
     // Sample data generation disabled - using LIVE blockchain data
     // await indexer.generateSampleData();
     
     // Start indexing real ERC-7683 events from Across Protocol
     await indexer.startIndexing();
-  });
+    console.log("✓ Live blockchain indexing started");
+  } catch (error) {
+    console.error("✗ Failed to initialize indexer:", error);
+    console.error("⚠ Platform will operate in read-only mode without live indexing");
+  }
 
   // Get all intents with optional filters
   app.get("/api/intents", async (req, res) => {
