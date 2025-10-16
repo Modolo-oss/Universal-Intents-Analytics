@@ -48,12 +48,17 @@ class IntentIndexer {
   async initialize() {
     console.log("Initializing Intent Indexer...");
     
+    const connectionResults: { success: number; failed: number } = { success: 0, failed: 0 };
+    
     for (const config of CHAIN_CONFIGS) {
       try {
         // Use WebSocketProvider for wss:// URLs, JsonRpcProvider for https://
         const provider = config.rpcUrl.startsWith('wss://')
           ? new ethers.WebSocketProvider(config.rpcUrl)
           : new ethers.JsonRpcProvider(config.rpcUrl);
+        
+        // Test connection by getting network info
+        await provider.getNetwork();
         
         this.providers.set(config.name, provider);
 
@@ -65,9 +70,20 @@ class IntentIndexer {
         this.contracts.set(config.name, contract);
 
         console.log(`✓ Connected to ${config.name} (${config.rpcUrl.startsWith('wss://') ? 'WebSocket' : 'HTTP'})`);
+        connectionResults.success++;
       } catch (error) {
         console.error(`✗ Failed to connect to ${config.name}:`, error);
+        connectionResults.failed++;
       }
+    }
+    
+    // Throw error if NO providers connected successfully
+    if (connectionResults.success === 0) {
+      throw new Error(`Failed to connect to any blockchain providers (0/${CHAIN_CONFIGS.length} succeeded)`);
+    }
+    
+    if (connectionResults.failed > 0) {
+      console.warn(`⚠ Connected to ${connectionResults.success}/${CHAIN_CONFIGS.length} chains (${connectionResults.failed} failed)`);
     }
   }
 
@@ -175,50 +191,6 @@ class IntentIndexer {
     }
     
     console.log("Indexer stopped");
-  }
-
-  // Generate sample data for demo purposes
-  async generateSampleData() {
-    console.log("Generating sample intent data...");
-    
-    const protocols = ["UniswapX", "1inch Fusion", "CowSwap", "0x Protocol"];
-    const chains = ["Ethereum", "Optimism", "Arbitrum", "Base"];
-    const statuses = ["success", "failed", "pending", "executing"];
-    const types = ["Cross-Chain Swap", "Bridge", "Swap"];
-
-    const sampleIntents: InsertIntent[] = [];
-    
-    for (let i = 0; i < 50; i++) {
-      const chain = chains[Math.floor(Math.random() * chains.length)];
-      const status = statuses[Math.floor(Math.random() * statuses.length)];
-      
-      sampleIntents.push({
-        id: `0x${Math.random().toString(16).slice(2).padEnd(64, '0')}`,
-        type: types[Math.floor(Math.random() * types.length)],
-        chain,
-        chainId: chains.indexOf(chain) + 1,
-        status,
-        solver: `0x${Math.random().toString(16).slice(2).padEnd(40, '0')}`,
-        fromAddress: `0x${Math.random().toString(16).slice(2).padEnd(40, '0')}`,
-        toAddress: `0x${Math.random().toString(16).slice(2).padEnd(40, '0')}`,
-        amount: (Math.random() * 1000000000000000000).toString(),
-        protocol: protocols[Math.floor(Math.random() * protocols.length)],
-        parameters: {},
-        events: [],
-        blockNumber: Math.floor(Math.random() * 1000000) + 18000000,
-        transactionHash: `0x${Math.random().toString(16).slice(2).padEnd(64, '0')}`,
-      });
-    }
-
-    for (const intent of sampleIntents) {
-      try {
-        await storage.createIntent(intent);
-      } catch (error) {
-        // Ignore duplicate errors
-      }
-    }
-
-    console.log(`✓ Generated ${sampleIntents.length} sample intents`);
   }
 }
 
