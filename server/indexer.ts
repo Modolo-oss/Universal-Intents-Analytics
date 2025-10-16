@@ -16,20 +16,27 @@ interface ChainConfig {
   contractAddress: string;
 }
 
-// Default chain configurations (using public RPCs)
+// Production chain configurations with real Across Protocol (AcrossOriginSettler) contracts
 const CHAIN_CONFIGS: ChainConfig[] = [
   {
-    name: "Ethereum",
-    chainId: 1,
-    rpcUrl: "https://eth.llamarpc.com",
-    contractAddress: "0x0000000000000000000000000000000000000001", // Placeholder
+    name: "Arbitrum",
+    chainId: 42161,
+    rpcUrl: "https://arb1.arbitrum.io/rpc",
+    contractAddress: "0xB0B07055F214Ce59ccb968663d3435B9f3294998", // Across AcrossOriginSettler
   },
   {
-    name: "Optimism",
-    chainId: 10,
-    rpcUrl: "https://mainnet.optimism.io",
-    contractAddress: "0x0000000000000000000000000000000000000002", // Placeholder
+    name: "Base",
+    chainId: 8453,
+    rpcUrl: "https://mainnet.base.org",
+    contractAddress: "0x4afb570AC68BfFc26Bb02FdA3D801728B0f93C9E", // Across AcrossOriginSettler
   },
+  // Testnet configuration (uncomment for testing)
+  // {
+  //   name: "Sepolia",
+  //   chainId: 11155111,
+  //   rpcUrl: "https://ethereum-sepolia.publicnode.com",
+  //   contractAddress: "0x43f133FE6fDFA17c417695c476447dc2a449Ba5B", // Across Testnet Spoke1
+  // },
 ];
 
 class IntentIndexer {
