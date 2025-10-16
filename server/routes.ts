@@ -5,11 +5,13 @@ import { insertIntentSchema } from "@shared/schema";
 import { indexer } from "./indexer";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Initialize indexer and generate sample data
+  // Initialize indexer and start listening for live blockchain events
   indexer.initialize().then(async () => {
-    await indexer.generateSampleData();
-    // Optionally start listening for real events
-    // await indexer.startIndexing();
+    // Sample data generation disabled - using LIVE blockchain data
+    // await indexer.generateSampleData();
+    
+    // Start indexing real ERC-7683 events from Across Protocol
+    await indexer.startIndexing();
   });
 
   // Get all intents with optional filters
