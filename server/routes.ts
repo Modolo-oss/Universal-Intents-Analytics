@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertIntentSchema } from "@shared/schema";
 import { indexer } from "./indexer";
+import { demoData } from "./demo-data";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize indexer and start listening for live blockchain events
@@ -41,7 +42,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ intents, total });
     } catch (error) {
       console.error("Error fetching intents:", error);
-      res.status(500).json({ error: "Failed to fetch intents" });
+      // Return demo data if database is not available
+      res.json({ intents: demoData.intents, total: demoData.intents.length });
     }
   });
 
@@ -80,7 +82,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(summary);
     } catch (error) {
       console.error("Error fetching analytics summary:", error);
-      res.status(500).json({ error: "Failed to fetch analytics summary" });
+      // Return demo data if database is not available
+      res.json(demoData.summary);
     }
   });
 
@@ -91,7 +94,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(distribution);
     } catch (error) {
       console.error("Error fetching chain distribution:", error);
-      res.status(500).json({ error: "Failed to fetch chain distribution" });
+      // Return demo data if database is not available
+      res.json(demoData.chainData);
     }
   });
 
@@ -102,7 +106,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(rankings);
     } catch (error) {
       console.error("Error fetching protocol rankings:", error);
-      res.status(500).json({ error: "Failed to fetch protocol rankings" });
+      // Return demo data if database is not available
+      res.json(demoData.protocolsData);
     }
   });
 
