@@ -107,7 +107,18 @@ export default function Landing() {
                 </Button>
               </Link>
               <a 
-                href="https://github.com/yourusername/universal-intents-analytics" 
+                href="https://universal-intents-analytics-production.up.railway.app" 
+                target="_blank" 
+                rel="noopener noreferrer"
+              >
+                <Button size="lg" variant="secondary" className="gap-2" data-testid="button-live-demo">
+                  <Globe className="w-5 h-5" />
+                  Live Demo
+                  <ExternalLink className="w-4 h-4" />
+                </Button>
+              </a>
+              <a 
+                href="https://github.com/Modolo-oss/Universal-Intents-Analytics" 
                 target="_blank" 
                 rel="noopener noreferrer"
               >
@@ -281,7 +292,7 @@ export default function Landing() {
             <div className="flex items-center gap-4">
               <Badge variant="outline">MIT License</Badge>
               <a 
-                href="https://github.com/yourusername/universal-intents-analytics" 
+                href="https://github.com/Modolo-oss/Universal-Intents-Analytics" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-sm text-muted-foreground hover:text-foreground"
