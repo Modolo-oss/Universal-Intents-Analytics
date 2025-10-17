@@ -9,9 +9,15 @@ import { fileURLToPath } from "url";
 
 const viteLogger = createLogger();
 
-// Fix for production build
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Fix for production build - more robust path resolution
+let __dirname: string;
+try {
+  const __filename = fileURLToPath(import.meta.url);
+  __dirname = path.dirname(__filename);
+} catch (error) {
+  // Fallback for production builds
+  __dirname = process.cwd();
+}
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -50,12 +56,24 @@ export async function setupVite(app: Express, server: Server) {
     const url = req.originalUrl;
 
     try {
-      const clientTemplate = path.resolve(
-        __dirname,
-        "..",
-        "client",
-        "index.html",
-      );
+      // Try multiple possible paths for the client template
+      const possibleTemplatePaths = [
+        path.resolve(__dirname, "..", "client", "index.html"),
+        path.resolve(process.cwd(), "client", "index.html"),
+        path.resolve(__dirname, "client", "index.html"),
+      ];
+
+      let clientTemplate: string | null = null;
+      for (const possiblePath of possibleTemplatePaths) {
+        if (fs.existsSync(possiblePath)) {
+          clientTemplate = possiblePath;
+          break;
+        }
+      }
+
+      if (!clientTemplate) {
+        throw new Error(`Could not find client template. Tried: ${possibleTemplatePaths.join(", ")}`);
+      }
 
       // always reload the index.html file from disk incase it changes
       let template = await fs.promises.readFile(clientTemplate, "utf-8");
@@ -73,11 +91,25 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(__dirname, "public");
+  // Try multiple possible paths for the dist directory
+  const possiblePaths = [
+    path.resolve(__dirname, "public"),
+    path.resolve(__dirname, "dist"),
+    path.resolve(process.cwd(), "dist"),
+    path.resolve(process.cwd(), "client", "dist"),
+  ];
 
-  if (!fs.existsSync(distPath)) {
+  let distPath: string | null = null;
+  for (const possiblePath of possiblePaths) {
+    if (fs.existsSync(possiblePath)) {
+      distPath = possiblePath;
+      break;
+    }
+  }
+
+  if (!distPath) {
     throw new Error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`,
+      `Could not find the build directory. Tried: ${possiblePaths.join(", ")}`,
     );
   }
 
@@ -85,6 +117,6 @@ export function serveStatic(app: Express) {
 
   // fall through to index.html if the file doesn't exist
   app.use("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
+    res.sendFile(path.resolve(distPath!, "index.html"));
   });
 }
