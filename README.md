@@ -26,43 +26,43 @@ The Universal Intents Analytics Platform is a comprehensive monitoring solution 
 ```mermaid
 graph TB
     subgraph "Blockchain Layer"
-        ETH[Ethereum<br/>Chain ID: 1]
-        ARB[Arbitrum<br/>Chain ID: 42161]
-        BASE[Base<br/>Chain ID: 8453]
-        OPT[Optimism<br/>Chain ID: 10]
-        SEP[Sepolia<br/>Chain ID: 11155111]
+        ETH["Ethereum<br/>Chain ID: 1"]
+        ARB["Arbitrum<br/>Chain ID: 42161"]
+        BASE["Base<br/>Chain ID: 8453"]
+        OPT["Optimism<br/>Chain ID: 10"]
+        SEP["Sepolia<br/>Chain ID: 11155111"]
     end
 
     subgraph "ERC-7683 Contracts"
-        ETH_CONTRACT[AcrossOriginSettler<br/>0xB0B07055...]
-        ARB_CONTRACT[AcrossOriginSettler<br/>0xB0B07055...]
-        BASE_CONTRACT[AcrossOriginSettler<br/>0x4afb570A...]
-        SEP_CONTRACT[Across Testnet<br/>0x43f133FE...]
+        ETH_CONTRACT["AcrossOriginSettler<br/>0xB0B07055..."]
+        ARB_CONTRACT["AcrossOriginSettler<br/>0xB0B07055..."]
+        BASE_CONTRACT["AcrossOriginSettler<br/>0x4afb570A..."]
+        SEP_CONTRACT["Across Testnet<br/>0x43f133FE..."]
     end
 
     subgraph "Indexer Service"
-        WS[WebSocket<br/>Connections]
-        PARSER[Event Parser<br/>& Validator]
-        STORAGE[Storage<br/>Writer]
+        WS["WebSocket<br/>Connections"]
+        PARSER["Event Parser<br/>& Validator"]
+        STORAGE["Storage<br/>Writer"]
     end
 
     subgraph "Database Layer"
-        PG[(PostgreSQL<br/>Database)]
-        INTENTS_TABLE[intents table<br/>- id, chain, status<br/>- solver, amount, protocol<br/>- events (JSONB)<br/>- timestamps, tx_hash]
+        PG[("PostgreSQL<br/>Database")]
+        INTENTS_TABLE["intents table<br/>- id, chain, status<br/>- solver, amount, protocol<br/>- events (JSONB)<br/>- timestamps, tx_hash"]
     end
 
     subgraph "API Layer"
-        EXPRESS[Express.js<br/>Server]
-        DRIZZLE[Drizzle ORM]
+        EXPRESS["Express.js<br/>Server"]
+        DRIZZLE["Drizzle ORM"]
         ROUTES["/api/intents<br/>/api/analytics<br/>/api/export"]
     end
 
     subgraph "Frontend Layer"
-        REACT[React + Vite]
-        DASHBOARD[Dashboard<br/>Metrics & Charts]
-        EXPLORER[Explorer<br/>Intent Table]
-        ANALYTICS[Analytics<br/>Visualizations]
-        QUERY[TanStack Query<br/>State Management]
+        REACT["React + Vite"]
+        DASHBOARD["Dashboard<br/>Metrics & Charts"]
+        EXPLORER["Explorer<br/>Intent Table"]
+        ANALYTICS["Analytics<br/>Visualizations"]
+        QUERY["TanStack Query<br/>State Management"]
     end
 
     %% Connections
@@ -71,10 +71,10 @@ graph TB
     BASE --> BASE_CONTRACT
     SEP --> SEP_CONTRACT
 
-    ETH_CONTRACT -->|CrossChainOrderOpened<br/>CrossChainOrderFilled<br/>CrossChainOrderCancelled| WS
-    ARB_CONTRACT -->|Events| WS
-    BASE_CONTRACT -->|Events| WS
-    SEP_CONTRACT -->|Events| WS
+    ETH_CONTRACT -->|"CrossChainOrderOpened<br/>CrossChainOrderFilled<br/>CrossChainOrderCancelled"| WS
+    ARB_CONTRACT -->|"Events"| WS
+    BASE_CONTRACT -->|"Events"| WS
+    SEP_CONTRACT -->|"Events"| WS
 
     WS --> PARSER
     PARSER --> STORAGE
