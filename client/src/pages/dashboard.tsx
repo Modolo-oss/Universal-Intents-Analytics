@@ -36,16 +36,84 @@ interface ProtocolData {
 }
 
 export default function Dashboard() {
+  // Demo data for all charts
+  const demoSummary: Summary = {
+    totalIntents: 1247,
+    successRate: 78.5,
+    activeChains: 4,
+    topProtocol: "Across Protocol"
+  };
+
+  const demoChainData: ChainData[] = [
+    { name: "Arbitrum", value: 456 },
+    { name: "Base", value: 389 },
+    { name: "Ethereum", value: 234 },
+    { name: "Optimism", value: 168 }
+  ];
+
+  const demoProtocolsData: ProtocolData[] = [
+    { name: "Across Protocol", intents: 456, percentage: 37 },
+    { name: "UniswapX", intents: 389, percentage: 31 },
+    { name: "1inch Fusion", intents: 234, percentage: 19 },
+    { name: "Other", intents: 168, percentage: 13 }
+  ];
+
+  const demoIntents: Intent[] = [
+    {
+      id: "0xabc123...",
+      type: "Cross-Chain Swap",
+      chain: "Arbitrum",
+      status: "success",
+      solver: "0x742d35...",
+      timestamp: "2 minutes ago"
+    },
+    {
+      id: "0xdef456...",
+      type: "Bridge",
+      chain: "Base",
+      status: "pending",
+      solver: "0x8f3a21...",
+      timestamp: "5 minutes ago"
+    },
+    {
+      id: "0xghi789...",
+      type: "Cross-Chain Swap",
+      chain: "Ethereum",
+      status: "success",
+      solver: "0x1a2b3c...",
+      timestamp: "8 minutes ago"
+    },
+    {
+      id: "0xjkl012...",
+      type: "Bridge",
+      chain: "Optimism",
+      status: "failed",
+      solver: "0x4d5e6f...",
+      timestamp: "12 minutes ago"
+    },
+    {
+      id: "0xmno345...",
+      type: "Cross-Chain Swap",
+      chain: "Arbitrum",
+      status: "success",
+      solver: "0x7g8h9i...",
+      timestamp: "15 minutes ago"
+    }
+  ];
+
   const { data: summary } = useQuery<Summary>({
     queryKey: ["/api/analytics/summary"],
+    initialData: demoSummary,
   });
 
   const { data: chainData } = useQuery<ChainData[]>({
     queryKey: ["/api/analytics/chain-distribution"],
+    initialData: demoChainData,
   });
 
   const { data: protocolsData } = useQuery<ProtocolData[]>({
     queryKey: ["/api/analytics/protocol-rankings"],
+    initialData: demoProtocolsData,
   });
 
   const { data: intentsData } = useQuery({
@@ -54,22 +122,20 @@ export default function Dashboard() {
       const res = await fetch("/api/intents?limit=10");
       return res.json();
     },
+    initialData: { intents: demoIntents },
   });
 
   const volumeData = [
-    { date: "Jan 1", ethereum: 4000, optimism: 2400, arbitrum: 1800, base: 1200 },
-    { date: "Jan 5", ethereum: 3000, optimism: 1398, arbitrum: 2100, base: 980 },
-    { date: "Jan 10", ethereum: 5000, optimism: 3800, arbitrum: 2500, base: 1500 },
-    { date: "Jan 15", ethereum: 2780, optimism: 3908, arbitrum: 1900, base: 1200 },
-    { date: "Jan 20", ethereum: 4890, optimism: 4800, arbitrum: 3100, base: 2100 },
-    { date: "Jan 25", ethereum: 6390, optimism: 3800, arbitrum: 2900, base: 1800 },
-    { date: "Jan 30", ethereum: 7490, optimism: 4300, arbitrum: 3500, base: 2300 },
+    { date: "Dec 1", arbitrum: 456, base: 389, ethereum: 234, optimism: 168 },
+    { date: "Dec 5", arbitrum: 523, base: 412, ethereum: 198, optimism: 145 },
+    { date: "Dec 10", arbitrum: 489, base: 445, ethereum: 267, optimism: 189 },
+    { date: "Dec 15", arbitrum: 567, base: 398, ethereum: 234, optimism: 201 },
+    { date: "Dec 20", arbitrum: 612, base: 456, ethereum: 289, optimism: 223 },
+    { date: "Dec 25", arbitrum: 534, base: 423, ethereum: 256, optimism: 187 },
+    { date: "Dec 30", arbitrum: 678, base: 512, ethereum: 312, optimism: 245 },
   ];
 
-  const recentIntents = intentsData?.intents?.map((intent: Intent) => ({
-    ...intent,
-    timestamp: formatDistanceToNow(new Date(intent.timestamp), { addSuffix: true }),
-  })) || [];
+  const recentIntents = intentsData?.intents || demoIntents;
 
   return (
     <div className="space-y-6">

@@ -23,60 +23,269 @@ The Universal Intents Analytics Platform is a comprehensive monitoring solution 
 
 ### System Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        BLOCKCHAIN LAYER                          │
-│  Ethereum │ Optimism │ Arbitrum │ Base │ ... (EVM Chains)       │
-│           ERC-7683 Intent Contracts                             │
-└────────────────────────┬────────────────────────────────────────┘
-                         │
-                         │ Events: CrossChainOrderOpened
-                         │         CrossChainOrderFilled
-                         │         CrossChainOrderCancelled
-                         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      INDEXER SERVICE                             │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
-│  │ Event        │  │ Data Parser  │  │ Storage      │          │
-│  │ Listeners    │→ │ & Validator  │→ │ Writer       │          │
-│  │ (ethers.js)  │  │              │  │              │          │
-│  └──────────────┘  └──────────────┘  └──────────────┘          │
-└────────────────────────┬────────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      POSTGRESQL DATABASE                         │
-│  ┌─────────────────────────────────────────────────────┐        │
-│  │  intents table:                                      │        │
-│  │  - id, chain, status, solver, amount, protocol       │        │
-│  │  - timestamps, transaction hashes, events (JSONB)    │        │
-│  │  - Indexed: status, chain, solver, timestamp         │        │
-│  └─────────────────────────────────────────────────────┘        │
-└────────────────────────┬────────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                         REST API                                 │
-│  Express.js + Drizzle ORM                                        │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
-│  │ /api/intents │  │ /api/        │  │ /api/export  │          │
-│  │              │  │ analytics    │  │ (CSV/JSON)   │          │
-│  └──────────────┘  └──────────────┘  └──────────────┘          │
-└────────────────────────┬────────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    FRONTEND (React + Vite)                       │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐             │
-│  │ Dashboard   │  │ Explorer    │  │ Analytics   │             │
-│  │ (Metrics)   │  │ (Table)     │  │ (Charts)    │             │
-│  └─────────────┘  └─────────────┘  └─────────────┘             │
-│                                                                  │
-│  TanStack Query → API Calls → Real-time UI Updates              │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph "Blockchain Layer"
+        ETH[Ethereum<br/>Chain ID: 1]
+        ARB[Arbitrum<br/>Chain ID: 42161]
+        BASE[Base<br/>Chain ID: 8453]
+        OPT[Optimism<br/>Chain ID: 10]
+        SEP[Sepolia<br/>Chain ID: 11155111]
+    end
+
+    subgraph "ERC-7683 Contracts"
+        ETH_CONTRACT[AcrossOriginSettler<br/>0xB0B07055...]
+        ARB_CONTRACT[AcrossOriginSettler<br/>0xB0B07055...]
+        BASE_CONTRACT[AcrossOriginSettler<br/>0x4afb570A...]
+        SEP_CONTRACT[Across Testnet<br/>0x43f133FE...]
+    end
+
+    subgraph "Indexer Service"
+        WS[WebSocket<br/>Connections]
+        PARSER[Event Parser<br/>& Validator]
+        STORAGE[Storage<br/>Writer]
+    end
+
+    subgraph "Database Layer"
+        PG[(PostgreSQL<br/>Database)]
+        INTENTS_TABLE[intents table<br/>- id, chain, status<br/>- solver, amount, protocol<br/>- events (JSONB)<br/>- timestamps, tx_hash]
+    end
+
+    subgraph "API Layer"
+        EXPRESS[Express.js<br/>Server]
+        DRIZZLE[Drizzle ORM]
+        ROUTES["/api/intents<br/>/api/analytics<br/>/api/export"]
+    end
+
+    subgraph "Frontend Layer"
+        REACT[React + Vite]
+        DASHBOARD[Dashboard<br/>Metrics & Charts]
+        EXPLORER[Explorer<br/>Intent Table]
+        ANALYTICS[Analytics<br/>Visualizations]
+        QUERY[TanStack Query<br/>State Management]
+    end
+
+    %% Connections
+    ETH --> ETH_CONTRACT
+    ARB --> ARB_CONTRACT
+    BASE --> BASE_CONTRACT
+    SEP --> SEP_CONTRACT
+
+    ETH_CONTRACT -->|CrossChainOrderOpened<br/>CrossChainOrderFilled<br/>CrossChainOrderCancelled| WS
+    ARB_CONTRACT -->|Events| WS
+    BASE_CONTRACT -->|Events| WS
+    SEP_CONTRACT -->|Events| WS
+
+    WS --> PARSER
+    PARSER --> STORAGE
+    STORAGE --> PG
+    PG --> INTENTS_TABLE
+
+    INTENTS_TABLE --> DRIZZLE
+    DRIZZLE --> EXPRESS
+    EXPRESS --> ROUTES
+
+    ROUTES --> QUERY
+    QUERY --> REACT
+    REACT --> DASHBOARD
+    REACT --> EXPLORER
+    REACT --> ANALYTICS
+
+    %% Styling
+    classDef blockchain fill:#e1f5fe
+    classDef contract fill:#f3e5f5
+    classDef indexer fill:#e8f5e8
+    classDef database fill:#fff3e0
+    classDef api fill:#fce4ec
+    classDef frontend fill:#f1f8e9
+
+    class ETH,ARB,BASE,OPT,SEP blockchain
+    class ETH_CONTRACT,ARB_CONTRACT,BASE_CONTRACT,SEP_CONTRACT contract
+    class WS,PARSER,STORAGE indexer
+    class PG,INTENTS_TABLE database
+    class EXPRESS,DRIZZLE,ROUTES api
+    class REACT,DASHBOARD,EXPLORER,ANALYTICS,QUERY frontend
 ```
 
-### Data Flow Explanation
+## 📋 ERC-7683 Event Schema
+
+### Event Definitions
+
+The platform monitors three core ERC-7683 events emitted by Across Protocol contracts:
+
+#### 1. CrossChainOrderOpened Event
+```solidity
+event CrossChainOrderOpened(
+    bytes32 indexed orderId,
+    address indexed user,
+    address indexed solver,
+    uint256 amount
+);
+```
+
+**Event Data Structure:**
+```typescript
+interface CrossChainOrderOpenedEvent {
+  orderId: string;        // Unique intent identifier (bytes32)
+  user: string;          // User address who created the intent
+  solver: string;        // Solver address responsible for execution
+  amount: string;        // Amount in wei (BigInt as string)
+  blockNumber: number;   // Block number when event was emitted
+  transactionHash: string; // Transaction hash
+  timestamp: string;      // ISO timestamp
+}
+```
+
+**Database Storage:**
+- **Status**: `"pending"`
+- **Type**: `"Cross-Chain Swap"`
+- **Protocol**: `"ERC-7683"` or `"Across Protocol"`
+
+#### 2. CrossChainOrderFilled Event
+```solidity
+event CrossChainOrderFilled(
+    bytes32 indexed orderId,
+    address indexed solver,
+    uint256 fillAmount
+);
+```
+
+**Event Data Structure:**
+```typescript
+interface CrossChainOrderFilledEvent {
+  orderId: string;        // Intent identifier to update
+  solver: string;        // Solver who executed the intent
+  fillAmount: string;    // Actual amount filled (BigInt as string)
+  blockNumber: number;   // Block number when event was emitted
+  transactionHash: string; // Transaction hash
+  timestamp: string;      // ISO timestamp
+}
+```
+
+**Database Update:**
+- **Status**: `"success"`
+- **Amount**: Updated with `fillAmount`
+- **Events**: Append new event to events array
+
+#### 3. CrossChainOrderCancelled Event
+```solidity
+event CrossChainOrderCancelled(
+    bytes32 indexed orderId,
+    address indexed user
+);
+```
+
+**Event Data Structure:**
+```typescript
+interface CrossChainOrderCancelledEvent {
+  orderId: string;        // Intent identifier to update
+  user: string;          // User who cancelled the intent
+  blockNumber: number;   // Block number when event was emitted
+  transactionHash: string; // Transaction hash
+  timestamp: string;      // ISO timestamp
+}
+```
+
+**Database Update:**
+- **Status**: `"failed"`
+- **Events**: Append cancellation event to events array
+
+### Event Processing Flow
+
+```mermaid
+sequenceDiagram
+    participant User as User
+    participant Contract as ERC-7683 Contract
+    participant Indexer as Indexer Service
+    participant DB as Database
+    participant API as REST API
+    participant Frontend as Frontend
+
+    User->>Contract: Create Intent
+    Contract->>Contract: Emit CrossChainOrderOpened
+    Contract->>Indexer: Event Log
+    Indexer->>Indexer: Parse Event Data
+    Indexer->>DB: Insert Intent (status: pending)
+    DB->>API: Data Available
+    API->>Frontend: Real-time Update
+
+    Note over Contract,Indexer: Intent Execution Phase
+
+    Contract->>Contract: Emit CrossChainOrderFilled
+    Contract->>Indexer: Event Log
+    Indexer->>Indexer: Parse Event Data
+    Indexer->>DB: Update Intent (status: success)
+    DB->>API: Data Updated
+    API->>Frontend: Status Change
+
+    Note over Contract,Indexer: Alternative: Intent Cancellation
+
+    Contract->>Contract: Emit CrossChainOrderCancelled
+    Contract->>Indexer: Event Log
+    Indexer->>Indexer: Parse Event Data
+    Indexer->>DB: Update Intent (status: failed)
+    DB->>API: Data Updated
+    API->>Frontend: Status Change
+```
+
+### Real-time Event Monitoring
+
+**WebSocket Connection Setup:**
+```typescript
+// server/indexer.ts
+const CHAIN_CONFIGS = [
+  {
+    name: "Arbitrum",
+    chainId: 42161,
+    rpcUrl: "wss://arbitrum-one-rpc.publicnode.com",
+    contractAddress: "0xB0B07055F214Ce59ccB968663d3435B9f3294998",
+  },
+  {
+    name: "Base",
+    chainId: 8453,
+    rpcUrl: "wss://base.publicnode.com", 
+    contractAddress: "0x4afb570AC68BfFc26Bb02FdA3D801728B0f93C9E",
+  }
+];
+
+// Event listener setup
+contract.on("CrossChainOrderOpened", async (orderId, user, solver, amount, event) => {
+  // Process and store intent
+});
+
+contract.on("CrossChainOrderFilled", async (orderId, solver, fillAmount, event) => {
+  // Update intent status to success
+});
+
+contract.on("CrossChainOrderCancelled", async (orderId, user, event) => {
+  // Update intent status to failed
+});
+```
+
+### Event History Tracking
+
+Each intent maintains a complete event history in the `events` JSONB field:
+
+```json
+{
+  "events": [
+    {
+      "type": "OrderOpened",
+      "timestamp": "2025-01-17T10:30:00Z",
+      "blockNumber": 18500000,
+      "transactionHash": "0xabc123..."
+    },
+    {
+      "type": "OrderFilled", 
+      "timestamp": "2025-01-17T10:35:00Z",
+      "blockNumber": 18500015,
+      "transactionHash": "0xdef456..."
+    }
+  ]
+}
+```
+
+This provides complete audit trail and enables advanced analytics on intent lifecycle patterns.
 
 #### 1. **Blockchain Event Emission**
 ```

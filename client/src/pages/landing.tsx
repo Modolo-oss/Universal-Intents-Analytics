@@ -103,7 +103,7 @@ export default function Landing() {
               <Link href="/dashboard">
                 <Button size="lg" className="gap-2" data-testid="button-try-demo">
                   <TrendingUp className="w-5 h-5" />
-                  Try Live Demo
+                  Try Demo
                 </Button>
               </Link>
               <a 
@@ -233,7 +233,7 @@ export default function Landing() {
                     <div className="text-center pt-4">
                       <Link href="/dashboard">
                         <Button size="lg" className="gap-2" data-testid="button-view-dashboard">
-                          View Live Dashboard
+                          View Dashboard
                           <ExternalLink className="w-4 h-4" />
                         </Button>
                       </Link>
